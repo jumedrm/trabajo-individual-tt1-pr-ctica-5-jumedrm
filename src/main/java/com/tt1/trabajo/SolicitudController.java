@@ -27,46 +27,53 @@ public class SolicitudController {
 		this.logger = logger;
 	}
 
-    @GetMapping("/solicitud")
-    public String solicitud(Model model) {
-        model.addAttribute("entities", ics.getEntities());
-        return "solicitud";
-    }
-    
-    @PostMapping("/solicitud")
-    public String handleSolicitud(@RequestParam Map<String, String> formData, Model model) {
-    	Map<Integer, Integer> validData = new HashMap<>();
-        List<String> errors = new ArrayList<>();
+	@GetMapping("/solicitud")
+	public String solicitud(Model model) {
+		model.addAttribute("entities", ics.getEntities());
+		return "solicitud";
+	}
+	
+	@PostMapping("/solicitud")
+	public String handleSolicitud(@RequestParam Map<String, String> formData, Model model) {
+		Map<Integer, Integer> validData = new HashMap<>();
+		List<String> errors = new ArrayList<>();
 
-        formData.forEach((key, value) -> {
-            try {
-                int num = Integer.parseInt(value);
-                if (num < 0) {
-                    errors.add(key + " no puede ser negativo");
-                }
-                int id = Integer.parseInt(key);
-                if (ics.isValidEntityId(id)) {
-                	validData.put(id, num);
-                } else {
-                	errors.add(key + "no se corresponde con una entidad");
-                }
-            } catch (NumberFormatException e) {
-                errors.add(key + " debe ser un número entero");
-            }
-        });
-        if(!errors.isEmpty()) {
-        	model.addAttribute("errors", errors);
-        	logger.warn("Atendida petición con errores");
-        } else {
-        	logger.info("Atendida petición");
-        	DatosSolicitud ds = new DatosSolicitud(validData);
-        	int tok = ics.solicitarSimulation(ds);
-        	if(tok != -1) {
-        		model.addAttribute("token", tok);
-        	} else {
-        		logger.error("Error en comunicación con servidor de simulación");
-        	}
-        }
-        return "formResult";
-    }
+		formData.forEach((key, value) -> {
+			try {
+				// el formulario envía los id de las entidades como nombres de los campos (key)
+				int id = Integer.parseInt(key);
+				int num = Integer.parseInt(value);
+				
+				if (num < 0) {
+					errors.add("el valor para la entidad " + key + " no puede ser negativo");
+				} else if (ics.isValidEntityId(id)) {
+					validData.put(id, num);
+				} else {
+					errors.add("id de entidad no válido: " + key);
+				}
+			} catch (NumberFormatException e) {
+				// ignoramos campos que no sean numéricos (como el botón de submit si viaja en el mapa)
+				if (!key.equals("_csrf")) { 
+					logger.debug("campo no numérico ignorado: " + key);
+				}
+			}
+		});
+
+		if (!errors.isEmpty()) {
+			model.addAttribute("errors", errors);
+			logger.warn("atendida petición con errores de validación");
+		} else {
+			logger.info("atendida petición de simulación correctamente");
+			DatosSolicitud ds = new DatosSolicitud(validData);
+			int tok = ics.solicitarSimulation(ds);
+			
+			if (tok != -1) {
+				model.addAttribute("token", tok);
+			} else {
+				model.addAttribute("errorServer", "no se pudo conectar con el servidor de simulación");
+				logger.error("error en comunicación con servidor de simulación (token -1)");
+			}
+		}
+		return "formResult";
+	}
 }

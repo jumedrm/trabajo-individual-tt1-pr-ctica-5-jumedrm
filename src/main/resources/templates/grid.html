@@ -22,8 +22,8 @@
 		</div>
 		<div class="grid" id='gr'></div>
 		<script th:inline="javascript">
-			const count = [[${count}]];
-			const colors = [[${colors}]];
+		const count = /*[[${count}]]*/ 0;
+		const colors = /*[[${colors}]]*/ {};
 			function createSquares(){
 				var grid = document.getElementById('gr');
 				for(var i = 0; i < count; i++){
@@ -46,6 +46,7 @@
 					}
 				}
 			});
+			createSquares();
 		</script>
 	</body>
 </html>
