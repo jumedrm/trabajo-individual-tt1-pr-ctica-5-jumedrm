@@ -41,8 +41,8 @@ public class ContactoSimServicio implements InterfazContactoSim {
 
         // 2. inicializar el apiclient generado
         ApiClient apiClient = new ApiClient(restTemplate);
-        apiClient.setBasePath("http://localhost:8080");
-
+        //apiClient.setBasePath("http://localhost:8080");//de normal uso esta
+        apiClient.setBasePath("http://host.docker.internal:8080");//para Docker uso esta
         this.solicitudApi = new SolicitudApi(apiClient);
         this.resultadosApi = new ResultadosApi(apiClient);
     }
@@ -59,7 +59,7 @@ public class ContactoSimServicio implements InterfazContactoSim {
             // usamos 5 porque es lo que pusimos en getEntities()
             for (int i = 0; i < 5; i++) {
                 listaCantidades.add(sol.getNums().getOrDefault(i, 0));
-                listaNombres.add(" Entidad " + i); // le damos un nombre genérico
+                listaNombres.add("Entidad " + i); // le damos un nombre genérico
             }
             
             // asignamos las dos listas al objeto que viaja a la VM
@@ -119,7 +119,7 @@ public class ContactoSimServicio implements InterfazContactoSim {
             }
         } catch (Exception e) {
             logger.error("error al procesar los datos del grid: " + e.getMessage());
-            e.printStackTrace();
+           // e.printStackTrace();
         }
         return ds;
     }
@@ -131,7 +131,7 @@ public class ContactoSimServicio implements InterfazContactoSim {
         for (int i = 0; i < 5; i++) {
             Entidad e = new Entidad();
             e.setId(i);
-            e.setName(" Entidad " + i);
+            e.setName("Entidad " + i);
             e.setDescripcion("Simulación de la entidad número " + i);
             lista.add(e);
         }
