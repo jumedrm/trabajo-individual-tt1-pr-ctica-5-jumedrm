@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mi-app-spring:
+    build: .
+    image: mi-app-individual
+    ports:
+      - "8081:8081"
+    networks:
+      - red-practica
+    depends_on:
+      - servicio-consumible
+
+  servicio-consumible:
+    image: javillour/servicio-tt1:amd64
+    networks:
+      - red-practica
+    # no pongo ports aquí para que sea invisible desde windows 
+
+networks:
+  red-practica:
+    driver: bridge

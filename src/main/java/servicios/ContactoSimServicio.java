@@ -42,7 +42,8 @@ public class ContactoSimServicio implements InterfazContactoSim {
         // 2. inicializar el apiclient generado
         ApiClient apiClient = new ApiClient(restTemplate);
         //apiClient.setBasePath("http://localhost:8080");//de normal uso esta
-        apiClient.setBasePath("http://host.docker.internal:8080");//para Docker uso esta
+        //apiClient.setBasePath("http://host.docker.internal:8080");//para Docker uso esta
+        apiClient.setBasePath("http://servicio-consumible:8080"); //para la práctica 7 la parte individual
         this.solicitudApi = new SolicitudApi(apiClient);
         this.resultadosApi = new ResultadosApi(apiClient);
     }
